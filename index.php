@@ -1,97 +1,97 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-
-    <title>Kalkulator BMI</title>
-  </head>
-  <body>
-    <div class="container d-flex justify-content-center mt-4">
-        <div class="card shadow" style="width:18rem">
-            <div class="card-body">
-                <form action="">
-                    <div class="for-group">
-                        <label for="">Tinggi Badan(cm)</label>
-                        <input type="text" class="form-control" name="tinggibadan" required>
-                    </div>
-                    <div class="for-group">
-                        <label for="">Berat Badan(kg)</label>
-                        <input type="text" class="form-control" name="beratbadan" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-sm" name="hitung">Hitung</button>
-                </form>
-            </div>
-    <?php
-        if (isset($_GET['hitung'])) {
-            $tinggibadan = $_GET['tinggibadan'];
-            $beratbadan = $_GET['beratbadan'];
-
-            $tbhasil = $_GET['tinggibadan']/100;
-            $bobot = $beratbadan / ($tbhasil * $tbhasil);
-
-            if($bobot <= 18.5) {
-                echo'
-                    <div class="card-footer">
-                        <div class="alert alert-primary alert-dismissible fade show" role="alert">
-                            Tinggi Badan(cm) : <b>'.$tinggibadan.' cm</b><br>
-                            Berat Badan(kg)  : <b>'.$beratbadan.' kg</b><br>
-                            Bobot            : <b>'.number_format($bobot,1).'</b><br>
-                             Keterangan       : <b> Berat Badan Kurang</b>
-                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                         </div>
-                    </div>
-                '; 
-            }elseif($bobot <= 25) {
-                    echo'
-                        <div class="card-footer">
-                            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                                 Tinggi Badan(cm) : <b>'.$tinggibadan.' cm</b><br>
-                                 Berat Badan(kg)  : <b>'.$beratbadan.' kg</b><br>
-                                 Bobot            : <b>'.number_format($bobot,1).'</b><br>
-                                 Keterangan       : <b> Berat Badan Normal</b>
-                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                             </div>
-                        </div>
-                        
-                    ';
-                }elseif($bobot <= 30) {
-                    echo'
-                        <div class="card-footer">
-                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
-                                Tinggi Badan(cm) : <b>'.$tinggibadan.' cm</b><br>
-                                Berat Badan(kg)  : <b>'.$beratbadan.' kg</b><br>
-                                Bobot            : <b>'.number_format($bobot,1).'</b><br>
-                                 Keterangan       : <b> Berat Badan Berlebih</b>
-                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                             </div>
-                        </div>
-                        
-                    ';  
-                }elseif($bobot > 30) {
-                    echo'
-                        <div class="card-footer">
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                Tinggi Badan(cm) : <b>'.$tinggibadan.' cm</b><br>
-                                Berat Badan(kg)  : <b>'.$beratbadan.' kg</b><br>
-                                Bobot            : <b>'.number_format($bobot,1).'</b><br>
-                                 Keterangan       : <b> Obesitas</b>
-                                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                             </div>
-                        </div>
-                        
-                    ';        
-            }
+<!DOCTYPE html>
+<html>
+<head>
+    <title>BMI Calculator</title>
+    <style>
+        .container {
+            width: 300px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            text-align: center;
         }
-    ?>
-</div>
+            .underweight {
+        color: red;
+        }
+
+        .normal-weight {
+            color: green;
+        }
+
+        .overweight {
+            color: orange;
+        }
+
+        .obese {
+            color: maroon;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>BMI Calculator</h2>
+        <form action="" method="post">
+            <label for="height">Tinggi Badan (cm):</label>
+            <input type="text" name="height" id="height" required><br><br>
+            
+            <label for="weight">Berat Badan (kg):</label>
+            <input type="text" name="weight" id="weight" required><br><br>
+            
+            <input type="submit" value="Calculate">
+        </form>
+        <?php
+        // Membuat koneksi ke database
+        $host = 'localhost';
+        $user = 'root';
+        $password = '';
+        $database = 'bmi';
+
+        $koneksi = mysqli_connect($host, $user, $password, $database);
+
+        // Cek koneksi
+        if (mysqli_connect_errno()) {
+            echo "Failed to connect to MySQL: " . mysqli_connect_error();
+            exit();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            // Mendapatkan data yang dikirim dari form
+            $weight = $_POST['weight'];
+            $height = $_POST['height'];
+            
+            // Menghitung BMI
+            $height_in_meters = $height / 100;
+            $bmi = $weight / ($height_in_meters ** 2);
+            
+            // Menentukan interpretasi BMI
+            if ($bmi < 18.5) {
+                $interpretation = "Kurus";
+                $color = "underweight";
+            } elseif ($bmi >= 18.5 && $bmi < 25) {
+                $interpretation = "Normal";
+                $color = "normal-weight";
+            } elseif ($bmi >= 25 && $bmi < 30) {
+                $interpretation = "Gemuk";
+                $color = "overweight";
+            } else {
+                $interpretation = "Obesitas";
+                $color = "obese";
+            }
+            $formatted_bobot = number_format($bmi, 1);
+            // Memasukkan data ke dalam database
+            $query = "INSERT INTO kalkulator (weight, height, bmi, interpretation) VALUES ('$weight', '$height', '$formatted_bobot', '$interpretation')";
+            mysqli_query($koneksi, $query);
+            
+            // Menampilkan hasil dengan kategori dan perbedaan warna
+            echo "<h3>Your BMI Result:</h3>";
+            echo "<p>Bobot: <strong>$formatted_bobot</strong></p>";
+            echo "<p>Keterangan: <span class='$color'>$interpretation</span></p>";
+        }
+
+        // Menutup koneksi
+        mysqli_close($koneksi);
+        ?>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-
-  </body>
+</body>
 </html>
